@@ -13,7 +13,6 @@ namespace Final.Project.Domain.Entities
         public string ReceiverAddress { get; set; }
         public string Subject { get; set; }
         public string Text { get; set; }
-        public string DeliveryStatus { get; set; } = "In queue";
         public int TryCount { get; set; } = 0;
     }
 }
