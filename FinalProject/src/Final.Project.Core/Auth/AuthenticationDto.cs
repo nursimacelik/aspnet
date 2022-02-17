@@ -27,7 +27,7 @@ namespace Final.Project.Core.Auth
     public class RegisterResponse
     {
         public bool Success { get; set; }
-        public string ErrorCode { get; set; }
+        public string ErrorMessage { get; set; }
         public UserDto NewUser { get; set; }
     }
 
@@ -42,7 +42,7 @@ namespace Final.Project.Core.Auth
     public class LoginResponse
     {
         public bool Success { get; set; }
-        public string ErrorCode { get; set; }
+        public string ErrorMessage { get; set; }
         public string AccessToken { get; set; }
     }
 }

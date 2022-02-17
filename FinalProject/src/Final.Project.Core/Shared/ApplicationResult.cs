@@ -16,7 +16,7 @@ namespace Final.Project.Core.Shared
     public class CommonApplicationResult
     {
         public DateTime ResponseTime { get; set; } = DateTime.UtcNow;
-        public bool Succeeded { get; set; }
+        public bool Success { get; set; }
         public string ErrorMessage { get; set; }
 
     }

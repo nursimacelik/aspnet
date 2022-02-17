@@ -20,13 +20,13 @@ namespace Final.Project.Core.Auth
             var validationResult = validator.Validate(request);
             if (!validationResult.IsValid)
             {
-                return new RegisterResponse { Success = false, ErrorCode = validationResult.ToString() };
+                return new RegisterResponse { Success = false, ErrorMessage = validationResult.ToString() };
             }
 
             var existingAccount = unitOfWork.User.Where(x => x.Email.Equals(request.Email)).FirstOrDefault();
             if (existingAccount != null)
             {
-                return new RegisterResponse { Success = false, ErrorCode = "Reg 1" };
+                return new RegisterResponse { Success = false, ErrorMessage = "Reg 1" };
             }
             
             var hash = GenerateSaltedHash(request.Password, request.Email);
@@ -56,7 +56,7 @@ namespace Final.Project.Core.Auth
             var validationResult = validator.Validate(request);
             if (!validationResult.IsValid)
             {
-                return new LoginResponse { Success = false, ErrorCode = validationResult.ToString() };
+                return new LoginResponse { Success = false, ErrorMessage = validationResult.ToString() };
             }
 
 
@@ -64,13 +64,13 @@ namespace Final.Project.Core.Auth
             var user = unitOfWork.User.Where(x => x.Email.Equals(request.Email)).FirstOrDefault();
             if(user == null)
             {
-                return new LoginResponse { Success = false, ErrorCode = "Login failed. Please check your credentials." };
+                return new LoginResponse { Success = false, ErrorMessage = "Login failed. Please check your credentials." };
             }
 
             // Check if account is blocked
             if (user.FailedLoginCount >= 3)
             {
-                return new LoginResponse { Success = false, ErrorCode = "You entered invalid credentials too many times." };
+                return new LoginResponse { Success = false, ErrorMessage = "You entered invalid credentials too many times." };
             }
 
             // Check if password is correct
@@ -80,7 +80,7 @@ namespace Final.Project.Core.Auth
             if (!same)
             {
                 HandleFailedLogin(unitOfWork, user);
-                return new LoginResponse { Success = false, ErrorCode = "Login failed. Please check your credentials." };
+                return new LoginResponse { Success = false, ErrorMessage = "Login failed. Please check your credentials." };
             }
 
             // Create and return the JWT token
@@ -89,12 +89,12 @@ namespace Final.Project.Core.Auth
             string token = TokenHandler.GenerateToken(key, iss, user);
             if(string.IsNullOrEmpty(token))
             {
-                return new LoginResponse { Success = false, ErrorCode = "Login failed 3" };
+                return new LoginResponse { Success = false, ErrorMessage = "Login failed 3" };
             }
             return new LoginResponse { Success = true, AccessToken = token };
         }
 
-        private static void HandleFailedLogin(IUnitOfWork unitOfWork, User user)
+        public static void HandleFailedLogin(IUnitOfWork unitOfWork, User user)
         {
             // Increment count for failed login attemps
             user.FailedLoginCount++;
@@ -109,7 +109,7 @@ namespace Final.Project.Core.Auth
             }
         }
 
-        private static Email CreateWelcomeEmail(User user)
+        public static Email CreateWelcomeEmail(User user)
         {
             var email = new Email
             {
@@ -122,7 +122,7 @@ namespace Final.Project.Core.Auth
             return email;
         }
 
-        private static Email CreateAccountBlockedEmail(User user)
+        public static Email CreateAccountBlockedEmail(User user)
         {
             var email = new Email
             {
@@ -140,7 +140,7 @@ namespace Final.Project.Core.Auth
 
 
 
-        private static byte[] GenerateSaltedHash(string password, string salt)
+        public static byte[] GenerateSaltedHash(string password, string salt)
         {
             var salted = Encoding.ASCII.GetBytes(password.Concat(salt).ToArray());
             var saltedHash = SHA1.HashData(salted);
@@ -148,7 +148,7 @@ namespace Final.Project.Core.Auth
 
         }
 
-        private static bool CompareHashes(byte[] hash1, byte[] hash2)
+        public static bool CompareHashes(byte[] hash1, byte[] hash2)
         {
             if (hash1.Length != hash2.Length)
             {

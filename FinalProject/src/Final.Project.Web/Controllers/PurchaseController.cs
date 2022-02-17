@@ -1,4 +1,6 @@
-﻿using Final.Project.Domain.Interfaces;
+﻿using Final.Project.Core.Shared;
+using Final.Project.Domain.Entities;
+using Final.Project.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

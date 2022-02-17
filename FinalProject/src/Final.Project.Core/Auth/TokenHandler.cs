@@ -18,9 +18,7 @@ namespace Final.Project.Core.Auth
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim("Email", user.Email),
-                new Claim("FirstName", user.FirstName),
-                new Claim("LastName", user.LastName)
+                new Claim("email", user.Email),
             };
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));

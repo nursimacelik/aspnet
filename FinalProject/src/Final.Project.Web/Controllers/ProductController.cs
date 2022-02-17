@@ -44,7 +44,7 @@ namespace Final.Project.Web.Api.Controllers
         {
             var user = await GetCurrentUserAsync();
             var result = await productService.Get(id, user);
-            if (result.Succeeded)
+            if (result.Success)
             {
                 return result;
             }
@@ -57,7 +57,7 @@ namespace Final.Project.Web.Api.Controllers
         {
             var user = await GetCurrentUserAsync();
             var result = await productService.Create(input, user);
-            if (result.Succeeded)
+            if (result.Success)
             {
                 return result;
             }
@@ -72,7 +72,7 @@ namespace Final.Project.Web.Api.Controllers
             {
                 var user = await GetCurrentUserAsync();
                 var result = await productService.Update(input, user);
-                if (result.Succeeded)
+                if (result.Success)
                 {
                     return result;
                 }

@@ -30,7 +30,7 @@ namespace Final.Project.Core.ProductServices
                 var validationResult = validator.Validate(input);
                 if (!validationResult.IsValid)
                 {
-                    return new ApplicationResult<ProductDto> { Succeeded = false, ErrorMessage = validationResult.ToString() };
+                    return new ApplicationResult<ProductDto> { Success = false, ErrorMessage = validationResult.ToString() };
                 }
 
                 Product product = mapper.Map<Product>(input);
@@ -41,7 +41,7 @@ namespace Final.Project.Core.ProductServices
                 ApplicationResult<ProductDto> result = new ApplicationResult<ProductDto>
                 {
                     Result = mapper.Map<ProductDto>(product),
-                    Succeeded = true
+                    Success = true
                 };
 
                 return result;
@@ -51,7 +51,7 @@ namespace Final.Project.Core.ProductServices
                 // log ex
                 return new ApplicationResult<ProductDto>
                 {
-                    Succeeded = false,
+                    Success = false,
                     ErrorMessage = "Error Occured!"
                 };
             }
@@ -66,13 +66,13 @@ namespace Final.Project.Core.ProductServices
                 {
                     await unitOfWork.Product.Delete(id);
                     unitOfWork.Complete();
-                    return new ApplicationResult { Succeeded = true };
+                    return new ApplicationResult { Success = true };
                 }
-                return new ApplicationResult { Succeeded = false, ErrorMessage = "Record cannot be found!" };
+                return new ApplicationResult { Success = false, ErrorMessage = "Record cannot be found!" };
             }
             catch (Exception ex)
             {
-                return new ApplicationResult { Succeeded = false, ErrorMessage = "Error occured!" };
+                return new ApplicationResult { Success = false, ErrorMessage = "Error occured!" };
             }
         }
 
@@ -86,7 +86,7 @@ namespace Final.Project.Core.ProductServices
                 return new ApplicationResult<ProductDto>
                 {
                     Result = dto,
-                    Succeeded = true
+                    Success = true
                 };
 
             }
@@ -94,7 +94,7 @@ namespace Final.Project.Core.ProductServices
             {
                 return new ApplicationResult<ProductDto>
                 {
-                    Succeeded = false,
+                    Success = false,
                     ErrorMessage = "Error Occured!"
                 };
             }
@@ -114,7 +114,7 @@ namespace Final.Project.Core.ProductServices
                 return new ApplicationResult<List<ProductDto>>
                 {
                     Result = dtoList,
-                    Succeeded = true
+                    Success = true
                 };
 
             }
@@ -122,7 +122,7 @@ namespace Final.Project.Core.ProductServices
             {
                 return new ApplicationResult<List<ProductDto>>
                 {
-                    Succeeded = false,
+                    Success = false,
                     ErrorMessage = "Error Occured!"
                 };
             }
@@ -135,24 +135,24 @@ namespace Final.Project.Core.ProductServices
                 var existingProduct = await unitOfWork.Product.GetById(input.Id);
                 if(existingProduct == null)
                 {
-                    return new ApplicationResult<ProductDto> { Succeeded = false, ErrorMessage = "Product not found!" };
+                    return new ApplicationResult<ProductDto> { Success = false, ErrorMessage = "Product not found!" };
                 }
 
                 if(existingProduct.UserId != user.Id)
                 {
-                    return new ApplicationResult<ProductDto> { Succeeded = false, ErrorMessage = "You cannot modify this product!" };
+                    return new ApplicationResult<ProductDto> { Success = false, ErrorMessage = "You cannot modify this product!" };
                 }
 
                 var product = mapper.Map<Product>(input);
                 await unitOfWork.Product.Update(product);
                 unitOfWork.Complete();
-                return new ApplicationResult<ProductDto> { Succeeded = true, Result = mapper.Map<ProductDto>(product) };
+                return new ApplicationResult<ProductDto> { Success = true, Result = mapper.Map<ProductDto>(product) };
             }
             catch (Exception ex)
             {
                 return new ApplicationResult<ProductDto>
                 {
-                    Succeeded = false,
+                    Success = false,
                     ErrorMessage = "Error Occured!"
                 };
             }
