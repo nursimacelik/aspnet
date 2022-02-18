@@ -10,7 +10,8 @@ namespace Final.Project.Core.EmailServices
         public static void AddEmailToQueue(Email email)
         {
             // Connect to Rabbitmq
-            var factory = new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest" };
+            var factory = new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest" }; 
+            factory.AutomaticRecoveryEnabled = true;
             using (IConnection connection = factory.CreateConnection())
             using (IModel channel = connection.CreateModel())
             {
