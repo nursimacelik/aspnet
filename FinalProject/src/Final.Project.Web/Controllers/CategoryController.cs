@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Final.Project.Web.Api.Controllers
@@ -30,7 +31,7 @@ namespace Final.Project.Web.Api.Controllers
         }
 
         [Authorize]
-        [HttpGet("/ById")]
+        [HttpGet("/Category/ById")]
         public async Task<IActionResult> GetById(int id = 0)
         {
             if(id == 0)
@@ -56,22 +57,42 @@ namespace Final.Project.Web.Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Category entity)
+        public async Task<IActionResult> Create([FromQuery] string name)
         {
-            var response = await unitOfWork.Category.Add(entity);
+            if (Exist(name))
+            {
+                return BadRequest($"{name} already exists.");
+            }
+            var item = new Category { Name = name };
+            await unitOfWork.Category.Add(item);
             unitOfWork.Complete();
-
-            return Ok();
+            return Ok(item);
         }
 
         [Authorize]
         [HttpPut]
-        public IActionResult Update([FromBody] Category entity)
+        public async Task<IActionResult> Update([FromBody] Category category)
         {
-            var response = unitOfWork.Category.Update(entity);
-            unitOfWork.Complete();
+            var item = await unitOfWork.Category.GetById(category.Id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            if (Exist(category.Name))
+            {
+                return BadRequest($"{category.Name} already exists.");
+            }
 
-            return Ok();
+            item.Name = category.Name;
+            await unitOfWork.Category.Update(item);
+            unitOfWork.Complete();
+            return Ok(item);
+        }
+
+        private bool Exist(string name)
+        {
+            var item = unitOfWork.Category.Where(x => x.Name.Equals(name)).FirstOrDefault();
+            return item != null;
         }
     }
 }

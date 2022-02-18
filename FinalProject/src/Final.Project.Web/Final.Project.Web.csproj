@@ -16,10 +16,6 @@
     <ProjectReference Include="..\Final.Project.Infrastructure\Final.Project.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Validators\" />
-  </ItemGroup>
-
 	<ItemGroup>
 		<InternalsVisibleTo Include="MyTestProject" />
 	</ItemGroup>

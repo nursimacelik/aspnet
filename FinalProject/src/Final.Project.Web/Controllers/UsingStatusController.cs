@@ -31,18 +31,17 @@ namespace Final.Project.Web.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] string name)
+        public async Task<IActionResult> Create([FromQuery] string name)
         {
-            var status = new UsingStatus { Name = name };
-            var statusExists = await Exist(status.Id);
-            if (statusExists)
+            if (Exist(name))
             {
-                return BadRequest("Status Id already exists.");
+                return BadRequest($"{name} already exists.");
             }
 
-            var result = await unitOfWork.UsingStatus.Add(status);
+            var item = new UsingStatus { Name = name };
+            await unitOfWork.UsingStatus.Add(item);
             unitOfWork.Complete();
-            return Ok(result);
+            return Ok(item);
         }
 
 
@@ -50,57 +49,27 @@ namespace Final.Project.Web.Controllers
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UsingStatus status)
         {
-            var statusExists = await Exist(status.Id);
-            if (!statusExists)
+            var item = await unitOfWork.UsingStatus.GetById(status.Id);
+            if (item == null)
             {
                 return NotFound();
             }
-            
-            // Check if any product has this status
-            if (InUsage(status.Id))
+            if (Exist(status.Name))
             {
-                return BadRequest("Status cannot be updated, some products are using it.");
+                return BadRequest($"{status.Name} already exists.");
             }
 
-            var result = await unitOfWork.UsingStatus.Update(status);
+            item.Name = status.Name;
+            await unitOfWork.UsingStatus.Update(item);
             unitOfWork.Complete();
-            return Ok(result);
+            return Ok(item);
         }
 
-
-        [Authorize]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody] UsingStatus status)
+        private bool Exist(string name)
         {
-            var statusExists = await Exist(status.Id);
-            if (!statusExists)
-            {
-                return NotFound();
-            }
-
-            // Check if any product has this status
-            if (InUsage(status.Id))
-            {
-                return BadRequest("Status cannot be deleted, some products are using it.");
-            }
-
-            await unitOfWork.UsingStatus.Delete(status.Id);
-            unitOfWork.Complete();
-            return Ok();
-        }
-
-        private bool InUsage(int id)
-        {
-            var productList = unitOfWork.Product.Where(x => x.UsingStatusId == id).FirstOrDefault();
-            return productList != null;
-        }
-
-        private async Task<bool> Exist(int id)
-        {
-            var item = await unitOfWork.UsingStatus.GetById(id);
+            var item = unitOfWork.UsingStatus.Where(x => x.Name.Equals(name)).FirstOrDefault();
             return item != null;
         }
-
 
     }
 }

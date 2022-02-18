@@ -11,6 +11,6 @@ namespace Final.Project.Domain.Entities
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string CategoryName { get; set; }
+        public string Name { get; set; }
     }
 }
