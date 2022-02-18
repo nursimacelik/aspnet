@@ -3,6 +3,7 @@ using Final.Project.Core.Shared;
 using Final.Project.Domain.Entities;
 using Final.Project.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,12 +16,14 @@ namespace Final.Project.Core.ProductServices
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IConfiguration configuration;
         private readonly IMapper mapper;
 
-        public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration)
         {
             this.mapper = mapper;
             this.unitOfWork = unitOfWork;
+            this.configuration = configuration;
         }
 
         public async Task<ApplicationResult<ProductDto>> Create(CreateProductInput input, User user)
@@ -163,6 +166,10 @@ namespace Final.Project.Core.ProductServices
 
         public async Task<ApplicationResult<ProductDto>> UpdateImage(int productId, IFormFile file, User user)
         {
+            if (file == null)
+            {
+                return new ApplicationResult<ProductDto> { Success = false, ErrorMessage = "Image field cannot be empty!" };
+            }
             var product = await unitOfWork.Product.GetById(productId);
             if (product == null)
             {
@@ -177,7 +184,8 @@ namespace Final.Project.Core.ProductServices
 
             // Save image file in the server
 
-            string uploads = "C:\\Users\\nursima\\uploads";
+            //string uploads = "C:\\Users\\nursima\\uploads";
+            string uploads = configuration["UploadsPath"];
             string filePath = Path.Combine(uploads, file.FileName);
             using (Stream fileStream = new FileStream(filePath, FileMode.Create))
             {
