@@ -4,11 +4,18 @@
 
 ## Çalıştırmak için
 
-- Veri tabanı betiği çalıştırılarak gerekli veri tabanları ve tablolar oluşturulmalı.
-  - Betik çalıştığı zaman "Final" ve "FinalHangfire" isimlerinde iki veri tabanı oluşmaktadır. Final veri tabanı içinde Brand, Category, Color, Email, Offer, Product, User, UsingStatus tabloları oluşur.
-- Web projesindeki ve Hangfire projesindeki appsettings.json içindeki connection string'ler düzenlenmeli.
-- Rabbitmq indirilmeli ve çalıştırılmalı.
-- Web projesi ve Hangfire projesi ayrı ayrı koşturulmalı.
+Visual Studio 2022, .Net 5.0 ve Sql Server 2019 kullandım.
+
+- Sunucuda "Final" ve "FinalHangfire" isimlerinde iki veri tabanı oluşturun. "script.sql" dosyasını çalıştırın.
+  - Betik çalıştığı zaman "Final" veri tabanı içinde Brand, Category, Color, Offer, Product, User, UsingStatus tabloları oluşur.
+- Web projesindeki ve Hangfire projesindeki appsettings.json içindeki connection string'leri düzenleyin.
+- Rabbitmq indirin ve çalıştırın.
+- Web projesi ve Hangfire projelerini ayrı ayrı koşturun.
+
+- E-posta gönderimini kullanmadığım bir hesaptan yaptım. Kullanıcı adım ve parola kodda gerekli yerde yazılı (Final.Project.Hangfire/Jobs/EmailConsumer.cs 63. satır). Ancak gmail hesabının gönderime izin vermesi gerekiyor. Bu izni açtım ama kullanılmadığında kendi kendine kapanabilir. Gerekirse giriş yaparak bu izni açabilirsiniz.
+  - Kullanıcı adı: nursimacelik00@gmail.com
+  - Parola: sodexobootcamp
+- Google hesabınızı yönetin -> Güvenlik -> Daha az güvenli uygulama erişimi
 
 ## Projede kullandığım yapılar
 
@@ -19,3 +26,11 @@
   - E-postaların arka planda kuyruktan çekilerek gönderilmesi : Hangfire
   - Gönderim: MailKit
 - Veriye erişim : EntityFramework, GenericRepository ve UnitOfWork modelleri
+
+
+# Api
+![Screenshot (14)](https://user-images.githubusercontent.com/33669453/154668708-7bc50a18-36c4-4b75-b7a4-a40b52c04e16.png)
+
+![Screenshot (15)](https://user-images.githubusercontent.com/33669453/154668774-44e6162d-60fc-42cc-a679-bce988acfb98.png)
+
+![Screenshot (16)](https://user-images.githubusercontent.com/33669453/154668815-5d525fe3-3956-4788-9f80-494702fa5d1f.png)
