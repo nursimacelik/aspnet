@@ -26,7 +26,7 @@ namespace Final.Project.IntegrationTests
         {
             return new List<Color>()
             {
-                new Color(){ Id = 10, ColorName = "Lilac" }
+                new Color(){ Id = 10, Name = "Lilac" }
             };
         }
         #endregion
