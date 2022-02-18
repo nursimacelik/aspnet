@@ -33,4 +33,5 @@ Visual Studio 2022, .Net 5.0 ve Sql Server 2019 kullandım.
 
 ![Screenshot (15)](https://user-images.githubusercontent.com/33669453/154668774-44e6162d-60fc-42cc-a679-bce988acfb98.png)
 
-![Screenshot (16)](https://user-images.githubusercontent.com/33669453/154668815-5d525fe3-3956-4788-9f80-494702fa5d1f.png)
+![Screenshot (17)](https://user-images.githubusercontent.com/33669453/154742535-847a68a3-49e6-42ff-85dd-471becbea9e1.png)
+
