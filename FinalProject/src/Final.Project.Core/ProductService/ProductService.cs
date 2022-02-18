@@ -2,8 +2,10 @@
 using Final.Project.Core.Shared;
 using Final.Project.Domain.Entities;
 using Final.Project.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -156,6 +158,39 @@ namespace Final.Project.Core.ProductServices
                     ErrorMessage = "Error Occured!"
                 };
             }
+        }
+
+
+        public async Task<ApplicationResult<ProductDto>> UpdateImage(int productId, IFormFile file, User user)
+        {
+            var product = await unitOfWork.Product.GetById(productId);
+            if (product == null)
+            {
+                return new ApplicationResult<ProductDto> { Success = false, ErrorMessage = "Product not found!" };
+            }
+
+            if (product.UserId != user.Id)
+            {
+                return new ApplicationResult<ProductDto> { Success = false, ErrorMessage = "You cannot modify this product!" };
+            }
+
+
+            // Save image file in the server
+
+            string uploads = "C:\\Users\\nursima\\uploads";
+            string filePath = Path.Combine(uploads, file.FileName);
+            using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            // Update path of the image in database
+            product.Image = filePath;
+            await unitOfWork.Product.Update(product);
+            unitOfWork.Complete();
+            
+            return new ApplicationResult<ProductDto> { Success = true, Result = mapper.Map<ProductDto>(product) };
+
         }
     }
 }

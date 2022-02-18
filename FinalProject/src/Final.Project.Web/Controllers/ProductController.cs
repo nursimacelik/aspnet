@@ -4,11 +4,13 @@ using Final.Project.Domain.Entities;
 using Final.Project.Domain.Interfaces;
 using Final.Project.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -92,5 +94,25 @@ namespace Final.Project.Web.Api.Controllers
             return await unitOfWork.User.GetById(id);
         }
 
+
+        [Authorize]
+        [HttpPut("/UpdateImage/{productId}")]
+        public async Task<ActionResult<ApplicationResult<ProductDto>>> UpdateImage(int productId, [FromForm] IFormFile file)
+        {
+            var user = await GetCurrentUserAsync();
+            var result = await productService.UpdateImage(productId, file, user);
+            if (result.Success)
+            {
+                return result;
+            }
+            return BadRequest(result);
+        }
+
+        private bool IsImage(Stream stream)
+        {
+            // png, jpg, jpeg
+            return true;
+
+        }
     }
 }

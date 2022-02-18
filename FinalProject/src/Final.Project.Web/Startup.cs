@@ -85,6 +85,7 @@ namespace Final.Project.Web
                         new List<string>()
                     }
                 });
+                c.OperationFilter<SwaggerFileOperationFilter>();
             });
 
             // add service
