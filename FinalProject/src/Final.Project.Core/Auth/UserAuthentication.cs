@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Final.Project.Core.EmailServices;
+using Final.Project.Core.Shared;
 using Final.Project.Domain.Entities;
 using Final.Project.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,40 @@ namespace Final.Project.Core.Auth
 
     public static class UserAuthentication
     {
-        public static RegisterResponse Register(IUnitOfWork unitOfWork, IMapper mapper, RegisterRequest request)
+
+        public static User currentUser;
+
+
+        public static ApplicationResult ChangePassword(IUnitOfWork unitOfWork, ChangePasswordRequest request, IConfiguration configuration)
+        {
+            // Validate input
+            var validator = new ChangePasswordValidator();
+            var validationResult = validator.Validate(request);
+            if (!validationResult.IsValid)
+            {
+                return new ApplicationResult { Success = false, ErrorMessage = validationResult.ToString() };
+            }
+
+            // Check if user exists and can authenticate 
+            var authResult = Authenticate(unitOfWork, request);
+            if (!authResult.Success)
+            {
+                return authResult;
+            }
+
+            // Update password
+
+            var hash = GenerateSaltedHash(request.NewPassword, request.Email);
+            currentUser.Password = hash;
+            unitOfWork.User.Update(currentUser);
+            unitOfWork.Complete();
+
+            return new ApplicationResult { Success = true };
+        }
+
+
+
+        public static ApplicationResult Register(IUnitOfWork unitOfWork, IMapper mapper, RegisterRequest request)
         {
             // Validate input
             var validator = new RegisterRequestValidator();
@@ -26,10 +60,10 @@ namespace Final.Project.Core.Auth
             var existingAccount = unitOfWork.User.Where(x => x.Email.Equals(request.Email)).FirstOrDefault();
             if (existingAccount != null)
             {
-                return new RegisterResponse { Success = false, ErrorMessage = "Reg 1" };
+                return new RegisterResponse { Success = false, ErrorMessage = $"Another account is using {request.Email}." };
             }
             
-            var hash = GenerateSaltedHash(request.Password, request.Email);
+            var hash = GenerateSaltedHash(request.NewPassword, request.Email);
             var user = new User
             {
                 FirstName = request.FirstName,
@@ -47,30 +81,20 @@ namespace Final.Project.Core.Auth
             var dto = mapper.Map<UserDto>(user);
             return new RegisterResponse { Success = true, NewUser = dto };
         }
-        
 
-        public static LoginResponse Authorize(IUnitOfWork unitOfWork, LoginRequest request, IConfiguration configuration)
+        public static ApplicationResult Authenticate(IUnitOfWork unitOfWork, LoginRequest request)
         {
-            // Validate input
-            var validator = new LoginRequestValidator();
-            var validationResult = validator.Validate(request);
-            if (!validationResult.IsValid)
-            {
-                return new LoginResponse { Success = false, ErrorMessage = validationResult.ToString() };
-            }
-
-
             // Check if user exists
             var user = unitOfWork.User.Where(x => x.Email.Equals(request.Email)).FirstOrDefault();
-            if(user == null)
+            if (user == null)
             {
-                return new LoginResponse { Success = false, ErrorMessage = "Login failed. Please check your credentials." };
+                return new ApplicationResult { Success = false, ErrorMessage = "Authentication failed. Please check your credentials." };
             }
 
             // Check if account is blocked
             if (user.FailedLoginCount >= 3)
             {
-                return new LoginResponse { Success = false, ErrorMessage = "You entered invalid credentials too many times." };
+                return new ApplicationResult { Success = false, ErrorMessage = "You entered invalid credentials too many times." };
             }
 
             // Check if password is correct
@@ -80,17 +104,36 @@ namespace Final.Project.Core.Auth
             if (!same)
             {
                 HandleFailedLogin(unitOfWork, user);
-                return new LoginResponse { Success = false, ErrorMessage = "Login failed. Please check your credentials." };
+                return new ApplicationResult { Success = false, ErrorMessage = "Login failed. Please check your credentials." };
+            }
+            currentUser = user;
+            return new ApplicationResult { Success = true };
+        }
+        
+
+        public static ApplicationResult Login(IUnitOfWork unitOfWork, LoginRequest request, IConfiguration configuration)
+        {
+            // Validate input
+            var validator = new LoginRequestValidator();
+            var validationResult = validator.Validate(request);
+            if (!validationResult.IsValid)
+            {
+                return new ApplicationResult { Success = false, ErrorMessage = validationResult.ToString() };
+            }
+
+
+            var result = Authenticate(unitOfWork, request);
+            if (!result.Success)
+            {
+                return result;
             }
 
             // Create and return the JWT token
+            
             var key = configuration["Jwt:Key"];
             var iss = configuration["Jwt:Issuer"];
-            string token = TokenHandler.GenerateToken(key, iss, user);
-            if(string.IsNullOrEmpty(token))
-            {
-                return new LoginResponse { Success = false, ErrorMessage = "Login failed 3" };
-            }
+            string token = TokenHandler.GenerateToken(key, iss, currentUser);
+
             return new LoginResponse { Success = true, AccessToken = token };
         }
 
@@ -137,7 +180,6 @@ namespace Final.Project.Core.Auth
             };
             return email;
         }
-
 
 
         public static byte[] GenerateSaltedHash(string password, string salt)

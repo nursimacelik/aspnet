@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Final.Project.Core.Auth;
+using Final.Project.Core.Shared;
 using Final.Project.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -26,16 +28,23 @@ namespace Final.Project.Web.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public LoginResponse Login([FromBody] LoginRequest request)
+        public ApplicationResult Login([FromBody] LoginRequest request)
         {
-            return UserAuthentication.Authorize(unitOfWork, request, configuration);
+            return UserAuthentication.Login(unitOfWork, request, configuration);
         }
 
         [HttpPost]
         [Route("Register")]
-        public RegisterResponse Register([FromBody] RegisterRequest request)
+        public ApplicationResult Register([FromBody] RegisterRequest request)
         {
             return UserAuthentication.Register(unitOfWork, mapper, request);
+        }
+
+        [HttpPost]
+        [Route("ChangePassword")]
+        public ApplicationResult ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            return UserAuthentication.ChangePassword(unitOfWork, request, configuration);
         }
     }
 }

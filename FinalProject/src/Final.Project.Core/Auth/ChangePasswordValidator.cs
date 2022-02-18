@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 
 namespace Final.Project.Core.Auth
 {
-    public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
+    public class ChangePasswordValidator : AbstractValidator<ChangePasswordRequest>
     {
-        public RegisterRequestValidator()
+        public ChangePasswordValidator()
         {
-            RuleFor(x => x.FirstName).NotEmpty();
-            RuleFor(x => x.LastName).NotEmpty();
             RuleFor(x => x.Email).EmailAddress();
+            RuleFor(x => x.Password).NotEmpty();
             RuleFor(x => x.NewPassword).MinimumLength(8).MaximumLength(20);
             RuleFor(x => x.NewConfirmPassword).Equal(x => x.NewPassword);
         }
