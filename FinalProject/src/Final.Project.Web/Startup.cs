@@ -61,9 +61,8 @@ namespace Final.Project.Web
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Final.Project.Web", Version = "v1" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = @"JWT Authorization header using the Bearer scheme.
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      Example: 'Bearer 12345abcdef'",
+                    Description = @"Please enter your Jwt token below.
+                      Example: 'Bearer <my_token>'",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
