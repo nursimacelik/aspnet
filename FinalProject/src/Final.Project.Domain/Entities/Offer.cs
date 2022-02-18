@@ -15,6 +15,6 @@ namespace Final.Project.Domain.Entities
         public int ProductOwnerId { get; set; }
         public int UserId { get; set; }
         public decimal PriceOffered { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = "On hold";
     }
 }
